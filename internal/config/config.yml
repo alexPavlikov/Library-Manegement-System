@@ -1,0 +1,14 @@
+---
+
+is_debug: true
+listen:
+  type: port
+  bind_ip: 0.0.0.0
+  port: 10000
+storage:
+  host: localhost
+  port: 5432
+  database: REST-API
+  username: postgres
+  password: AlexPAV2307
+  max_attempts: 3
