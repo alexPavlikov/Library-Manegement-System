@@ -8,7 +8,7 @@ listen:
 storage:
   host: localhost
   port: 5432
-  database: REST-API
+  database: Library
   username: postgres
   password: AlexPAV2307
   max_attempts: 3

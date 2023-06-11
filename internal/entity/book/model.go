@@ -3,8 +3,8 @@ package book
 type Book struct {
 	UUID       string
 	Name       string
-	Genre      string
-	Year       string
+	Genre      []string
+	Year       uint16
 	Publishing Publishing
 	Authors    []Author
 }

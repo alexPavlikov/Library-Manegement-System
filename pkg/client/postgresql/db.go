@@ -22,9 +22,9 @@ type Client interface {
 	BeginTxFunc(ctx context.Context, txOptions pgx.TxOptions, f func(pgx.Tx) error) error
 }
 
-func NewClient(ctx context.Context, cfg config.StorageConfig) (pool *pgxpool.Pool, err error) {
+func NewClient(ctx context.Context, pc config.StorageConfig) (pool *pgxpool.Pool, err error) {
 	logger := logging.GetLogger()
-	dsn := fmt.Sprintf("//%s:%s@%s:%s/%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
+	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", pc.Username, pc.Password, pc.Host, pc.Port, pc.Database)
 	err = utils.DoWithTries(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
@@ -33,9 +33,11 @@ func NewClient(ctx context.Context, cfg config.StorageConfig) (pool *pgxpool.Poo
 			return err
 		}
 		return nil
-	}, cfg.MaxAttempts, 5*time.Second)
+	}, 3, 5*time.Second)
+
 	if err != nil {
-		logger.Fatal("error do with tries to postgresql")
+		logger.Fatal("error do with tries postgresql")
 	}
+
 	return pool, nil
 }
