@@ -1,0 +1,492 @@
+@font-face {
+    font-family: 'Montserrat';
+    src: url(/assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf);
+}
+
+@font-face {
+    font-family: 'Montserrat-italic';
+    src: url(/assets/fonts/Montserrat/Montserrat-Italic-VariableFont_wght.ttf);
+}
+
+html {
+    min-height: 100vh;
+}
+
+body {
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: rgba(214, 223, 231, 0.250);
+    position: relative;
+}
+header {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    height: 100px;
+}
+
+.container {
+    padding: 0 15%;
+}
+
+header .logo {
+    width: 30%;
+    height: 100%;
+    position: relative;
+}
+
+header .logo img {
+    width: 100px;
+    height: 100px;
+}
+
+header .logo span {
+    color: rgba(0, 0, 0, 0.75);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%)
+}
+
+header .find {
+    width: 40%;
+    height: 100%;
+}
+
+header .find form {
+    padding: 6% 0;
+}
+
+header .find form input {
+    padding: 5px 8px;
+    border-right: none;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border: 1px solid grey;
+    margin: 0;
+    outline:none;
+    font-size: 22px;
+    font-family: 'Montserrat', sans-serif;
+    border-right: none;
+}
+
+header .find form select {
+    font-family: 'Montserrat', sans-serif;
+    padding: 6px 8px 5px 8px;
+    margin-left: -5px;
+    font-size: 20px;
+    border: 1px solid grey;
+    border-left: none;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+header .find form select:focus {
+    outline: 0;
+}
+
+header .find form button {
+    font-family: 'Montserrat', sans-serif;
+    padding: 7px 20px;
+    background-color: rgb(255, 186, 81);
+    border: none;
+    font-size: 22px;
+    border-radius: 15px;
+    color: white;
+    font-weight: 700;
+}
+
+header .find form button:hover {
+    cursor: pointer;
+}
+
+header .find form button:active {
+    opacity: .8;
+}
+
+header .entrance-reg {
+    width: 30%;
+    height: 100%;
+    position: relative;
+
+}
+
+header .entrance-reg span {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+}
+
+header .entrance-reg span a {
+    text-decoration: none;
+    color: grey;
+    font-size: 18px;
+    transition: all linear .1s;
+}
+
+header .entrance-reg span i {
+    margin-right: 10px;
+    transition: all linear .1s;
+}
+
+header .entrance-reg span i:hover {
+    color: rgb(255, 186, 81);
+    
+}
+
+header .entrance-reg span a:hover {
+    color: rgb(255, 186, 81);
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+}
+
+main .category {
+
+    width: 30%;
+    position: relative;
+    min-height: 100vh;
+}
+
+main .category .list {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 30px 0;
+    width: 100%;
+}
+
+main .category .list span {
+    padding: 10px 0;
+    font-size: 18px;
+    width: 100%;
+    font-weight: 700;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: background-color .3s linear;
+}
+
+main .category .list span a {
+    width: 100%;
+    padding: 0 10px;
+    color: rgba(0, 0, 0, 0.75);
+    text-decoration: none;
+}
+
+main .category .list span:hover {
+    background-color: rgb(255, 186, 81);
+}
+
+main .main {
+    width: 70%;
+    background-color: rgba(219, 219, 219, 0.3);
+    min-height: 60vh;
+}
+
+main .main h2 {
+    margin: 5% 0 0 10%;
+}
+
+main .main .books {
+    display: grid;
+    margin: 50px 5% 0 5%;
+    grid-template-columns: repeat(3, 33%);
+    gap: 20px;
+}
+
+main .main .books .book {
+    width: 100%;
+    min-height: 350px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+main .main .books .book .img {
+    height: 60%;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+main .main .books .book .img img {
+    height: 100%;
+    width: 70%;
+    margin: 0 15%;
+    border-radius: 10px;
+    transition: box-shadow .1s linear;
+}
+
+main .main .books .book .img img:hover {
+    box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.4);
+}
+
+main .main .books .book .content {
+    height: 50%;
+    width: 70%;
+    margin: 0 15%;
+    text-align: justify;
+}
+
+main .main .books .book .content .name {
+    margin-bottom: 10px;
+}
+
+main .main .books .book .content .name a {
+   color: rgba(0, 0, 0, 0.75);
+   text-decoration: none;
+   font-weight: 700;
+   transition: color .1s linear;
+}
+
+main .main .books .book .content .name a:hover {
+    color: rgb(255, 186, 81);
+}
+
+main .main .books .book .content .authors div {
+    width: 100%;
+}
+
+main .main .books .book .content .authors div a {
+    width: 100%;
+    font-weight: 500;
+    color: rgba(121, 121, 121, 0.75);
+    text-decoration: none;
+    transition: color .1s linear;
+}
+
+main .main .books .book .content .authors div a:hover {
+    color: rgb(255, 186, 81);
+}
+
+main .main .link {
+    margin: 30px 10% 20px 10%;
+    width: 80%;
+}
+
+main .main .link div a:last-child {
+    font-weight: 700;
+}
+
+main .main .link div a {
+    margin: 0 3px;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.75);
+    transition: color .1s linear;
+}
+
+main .main .link div a:hover {
+    color: rgb(255, 186, 81);
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+/* modal */
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+  }
+  
+  .wrapper a {
+    display: inline-block;
+    text-decoration: none;
+  
+    border-radius: 3px;
+  }
+  
+  .modal {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(77, 77, 77, .7);
+    transition: all .4s;
+    z-index: 1000;
+    min-height: 100vh;
+
+  }
+
+
+  .modal:target {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .modal__content {
+    border-radius: 4px;
+    position: relative;
+    width: 60%;
+    background: #fff;
+    padding: 1em 2em;
+    margin: 20% 15%;
+    height: 70%;
+    overflow-y: initial !important
+  }
+
+    
+  .modal__content main {
+    margin: 2% 1% 0 1%;
+    height: 98%;
+    overflow-y: auto;
+    width: 98%;
+    background-color: rgba(219, 219, 219, 0.3);
+  }
+  
+  .modal__content main .main {
+    background-color: rgba(219, 219, 219, 0);
+  }
+
+  .modal__close {
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    color: #ff0000;
+    text-decoration: none;
+    font-size: 50px;
+  }
+
+  .modal__footer {
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+    color:  rgb(255, 186, 81);
+  }
+
+  .modal__footer a {
+    color:  rgb(255, 186, 81);
+  }
+
+  .be-comment-block {
+    margin-bottom: 50px !important;
+    border-radius: 2px;
+    padding: 50px 70px;
+    
+}
+
+.comments-title {
+    font-size: 16px;
+    color: #262626;
+    margin-bottom: 15px;
+}
+
+.be-img-comment {
+    width: 60px;
+    height: 60px;
+    float: left;
+    margin-bottom: 15px;
+}
+
+.be-ava-comment {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.be-comment-content {
+    margin-left: 80px;
+}
+
+.be-comment-content span {
+    display: inline-block;
+    width: 49%;
+    margin-bottom: 15px;
+}
+
+.be-comment-name {
+    font-size: 13px;
+
+}
+
+.be-comment-content a {
+    color: #383b43;
+}
+
+.be-comment-content span {
+    display: inline-block;
+    width: 49%;
+    margin-bottom: 15px;
+}
+
+.be-comment-time {
+    text-align: right;
+}
+
+.be-comment-time {
+    font-size: 11px;
+    color: #b4b7c1;
+}
+
+.be-comment-text {
+    font-size: 13px;
+    line-height: 18px;
+    color: #181818;
+    display: block;
+    background: #ffffff;
+    border: 1px solid #edeff2;
+    border-radius: 15px;
+    padding: 15px 20px 20px 20px;
+}
+
+.form-group.fl_icon .icon {
+    position: absolute;
+    top: 1px;
+    left: 16px;
+    width: 48px;
+    height: 48px;
+    background: #f6f6f7;
+    color: #b5b8c2;
+    text-align: center;
+    line-height: 50px;
+    -webkit-border-top-left-radius: 2px;
+    -webkit-border-bottom-left-radius: 2px;
+    -moz-border-radius-topleft: 2px;
+    -moz-border-radius-bottomleft: 2px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}
+
+.form-group .form-input {
+    font-size: 13px;
+    line-height: 50px;
+    font-weight: 400;
+    color: #b4b7c1;
+    width: 100%;
+    height: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: 1px solid #edeff2;
+    border-radius: 3px;
+}
+
+.form-group.fl_icon .form-input {
+    padding-left: 70px;
+}
+
+.form-group textarea.form-input {
+    height: 150px;
+}

@@ -34,7 +34,7 @@ func (s *Service) GetAll(ctx context.Context) ([]Book, error) {
 	return books, nil
 }
 func (s *Service) GetBook(ctx context.Context, uuid string) (Book, error) {
-	book, err := s.repository.GetBook(ctx, uuid)
+	book, err := s.repository.GetOne(ctx, uuid)
 	if err != nil {
 		return Book{}, fmt.Errorf("failed to get book, due to err: %v", err)
 	}

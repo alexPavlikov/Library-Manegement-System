@@ -1,12 +1,19 @@
 package book
 
 type Book struct {
-	UUID       string
-	Name       string
-	Genre      []string
-	Year       uint16
-	Publishing Publishing
-	Authors    []Author
+	UUID        string
+	Name        string
+	Photo       string
+	Genre       []string
+	Year        uint16
+	Pages       uint16
+	Rating      uint8
+	Description string
+	PDFLink     string
+	Publishing  Publishing
+	Authors     []Author
+	Awards      []Awards
+	Deleted     bool
 }
 
 type Author struct {

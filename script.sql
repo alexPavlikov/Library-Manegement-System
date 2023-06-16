@@ -8,7 +8,12 @@ CREATE TABLE public.publishing (
 CREATE TABLE public.book (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
+    photo VARCHAR(100) NOT NULL,
     year smallint NOT NULL,
+    pages smallint NOT NULL,
+    rating smallint NOT NULL,
+    description TEXT NOT NULL,
+    pdf_link VARCHAR(100) NOT NULL,
     publishing UUID NOT NULL,
     deleted boolean DEFAULT false,
     CONSTRAINT publishing_fk FOREIGN KEY (publishing) REFERENCES public.publishing(id)
@@ -25,6 +30,25 @@ CREATE TABLE public.author (
     date_of_death VARCHAR(30),
     gender VARCHAR(15) NOT NULL,
     deleted boolean DEFAULT false
+);
+
+CREATE TABLE public.user (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    firstname VARCHAR(100) NOT NULL,
+    lastname VARCHAR(100) NOT NULL,
+    age smallint NOT NULL,
+    date_of_birth VARCHAR(30) NOT NULL, 
+    gender VARCHAR(15) NOT NULL,
+    deleted boolean DEFAULT false
+);
+
+CREATE TABLE public.user_favourites (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    book_id UUID NOT NULL,
+    CONSTRAINT user_fk FOREIGN KEY (user_id) REFERENCES public.user(id),
+    CONSTRAINT book_fk FOREIGN KEY (book_id) REFERENCES public.book(id),
+    CONSTRAINT user_book_unique UNIQUE (user_id, book_id)
 );
 
 CREATE TABLE public.book_authors (
@@ -55,7 +79,7 @@ CREATE TABLE public.award (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100),
     deleted boolean DEFAULT false
-)
+);
 
 CREATE TABLE public.book_awards (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -64,9 +88,20 @@ CREATE TABLE public.book_awards (
     year smallint NOT NULL,
     CONSTRAINT book_fk FOREIGN KEY (book_id) REFERENCES public.book(id),
     CONSTRAINT award_fk FOREIGN KEY (award_id) REFERENCES public.award(id),
-    CONSTRAINT book_genre_unique UNIQUE (book_id, award_id)
-)
+    CONSTRAINT book_awards_unique UNIQUE (book_id, award_id)
+);
 
+CREATE TABLE public.comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    book_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    time VARCHAR(50) NOT NULL,
+    comment text,
+    deleted boolean DEFAULT false,
+    CONSTRAINT book_fk FOREIGN KEY (book_id) REFERENCES public.book(id),
+    CONSTRAINT user_fk FOREIGN KEY (user_id) REFERENCES public.user(id),
+    CONSTRAINT book_user_unique UNIQUE (book_id, user_id)
+);
 
 для массива авторов
 

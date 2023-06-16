@@ -18,14 +18,14 @@ func (r *repository) Create(ctx context.Context, book *Book) error {
 	query := `
 	INSERT INTO 
 		public.book 
-		(name, genre, year, publishing,	authors, delete)
+		(name, photo, year, pages, rating, description, pdf_link, publishing)
 	VALUES 
-		($1, $2, $3, $4, $5)
+		($1, $2, $3, $4, $5, $6, $7, $8)
 	RETURNING id
 	`
 	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
 
-	rows := r.client.QueryRow(ctx, query, &book.Name, &book.Genre, &book.Year, &book.Publishing.UUID, &book.Authors, false)
+	rows := r.client.QueryRow(ctx, query, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Rating, &book.Description, &book.PDFLink, &book.Publishing.UUID)
 	err := rows.Scan(book.UUID)
 	if err != nil {
 		return err
@@ -36,8 +36,9 @@ func (r *repository) Create(ctx context.Context, book *Book) error {
 // GetAll implements Repository.
 func (r *repository) GetAll(ctx context.Context) ([]Book, error) {
 	query := `
-	SELECT id, name, year, publishing
-	FROM public.book
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.rating, b.description, b.pdf_link, b.publishing, p.name
+	FROM public.book b
+	JOIN public.publishing p ON p.id = b.publishing
 	WHERE deleted = false;
 	`
 	var Books []Book
@@ -48,20 +49,20 @@ func (r *repository) GetAll(ctx context.Context) ([]Book, error) {
 		return nil, err
 	}
 	for rows.Next() {
-		var b Book
-		err = rows.Scan(&b.UUID, &b.Name, &b.Year, &b.Publishing.UUID)
+		var book Book
+		err = rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Rating, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name)
 		if err != nil {
 			return nil, err
 		}
-		Books = append(Books, b)
+		Books = append(Books, book)
 	}
 	return Books, nil
 }
 
 // GetBook implements Repository.
-func (r *repository) GetBook(ctx context.Context, uuid string) (Book, error) {
+func (r *repository) GetOne(ctx context.Context, uuid string) (Book, error) {
 	query := `
-	SELECT b.id, b.name, b.year, p.id, p.name  FROM public.book b
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.rating, b.description, b.pdf_link, b.publishing, p.name  FROM public.book b
 	JOIN public.publishing p ON p.id = b.publishing
 	WHERE b.id = $1 AND b.deleted = 'false';
 	`
@@ -69,33 +70,38 @@ func (r *repository) GetBook(ctx context.Context, uuid string) (Book, error) {
 	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
 
 	rows := r.client.QueryRow(context.TODO(), query, uuid)
-	var b Book
-	err := rows.Scan(&b.UUID, &b.Name, &b.Year, &b.Publishing.UUID, &b.Publishing.Name)
+	var book Book
+	err := rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Rating, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name)
 	if err != nil {
 		return Book{}, err
 	}
-	b.Authors, err = r.FindAllAuthorsByBook(ctx, uuid)
+	book.Authors, err = r.FindAllAuthorsByBook(ctx, uuid)
 	if err != nil {
 		return Book{}, err
 	}
-	b.Genre, err = r.FindAllGenreByBook(ctx, uuid)
+	book.Genre, err = r.FindAllGenreByBook(ctx, uuid)
 	if err != nil {
 		return Book{}, err
 	}
-	return b, nil
+	book.Awards, err = r.FindAllAwardsByBook(ctx, uuid) //dont work
+	if err != nil {
+		return Book{}, err
+	}
+
+	return book, nil
 }
 
 // Update implements Repository.
 func (r *repository) Update(ctx context.Context, book *Book) error {
 	query := `
 	UPDATE INTO public.book
-	SET name = $1, genre = $2, year = $3, publishing = $4, authors = $5
-	WHERE id =  $6
+	SET name = $1, photo = $2, year = $3, pages = $4, rating = $5, description = $6, pdf_link= $7, publishing = $8
+	WHERE id =  $9
 	`
 
 	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
 
-	_, err := r.client.Query(ctx, query, &book.Name, &book.Genre, &book.Year, &book.Publishing.UUID, &book.Authors, &book.UUID)
+	_, err := r.client.Query(ctx, query, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Rating, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.UUID)
 	if err != nil {
 		return err
 	}
@@ -171,6 +177,10 @@ func (r *repository) FindAllGenreByBook(ctx context.Context, uuid string) ([]str
 		genres = append(genres, name)
 	}
 	return genres, nil
+}
+
+func (r *repository) FindAllAwardsByBook(ctx context.Context, uuid string) ([]Awards, error) {
+	return nil, nil
 }
 
 func NewRepository(client postgresql.Client, logger *logging.Logger) Repository {

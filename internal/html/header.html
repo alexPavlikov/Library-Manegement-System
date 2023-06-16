@@ -1,0 +1,37 @@
+{{ define "header" }}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" href="/assets/css/awesome/css/all.css" />
+<link rel="stylesheet" href="../assets/css/style.css">
+
+<header class="container">
+    <div class="logo">
+        <a href="/">
+            <img src="../../assets/icons/icons8-library-100.png" alt="LibyDon.ru">
+            <span>LibyDon.ru</span>
+        </a>
+    </div>
+    <div class="find">
+        <form action="" method="post" autocomplete="off">
+            <input type="text" name="find" placeholder="Я ищу">
+            <select name="category_find">
+                <option value="Книги" selected>Книги</option>
+                <option value="Авторы">Авторы</option>
+            </select>
+            <button type="submit">Найти</button>
+        </form>
+    </div>
+    <div class="entrance-reg">
+        <span><a href="/entrance"><i class="fa-solid fa-door-open"></i>Вход</a></span>
+    </div>
+</header>
+
+{{ end }}

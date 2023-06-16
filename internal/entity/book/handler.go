@@ -24,13 +24,22 @@ func NewHandler(logger *logging.Logger, service *Service) handlers.Handlers {
 }
 
 func (h *handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodGet, "/book/", h.indexHandler)
-	router.HandlerFunc(http.MethodGet, "/book/all", h.GetAllBookHandler)
-	router.HandlerFunc(http.MethodPost, "/book/", h.BookHandler)
+	router.ServeFiles("/assets/*filepath", http.Dir("assets"))
+
+	router.HandlerFunc(http.MethodGet, "/", h.indexHandler)
+	//router.HandlerFunc(http.MethodGet, "/book/all", h.GetAllBookHandler)
+	router.HandlerFunc(http.MethodGet, "/book/:uuid", h.BookHandler)
+
+	router.HandlerFunc(http.MethodGet, "/test", h.TestHandler)
 }
 
 func (h *handler) indexHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./internal/html/index.html")
+	tmpl, err := template.ParseGlob("./internal/html/*.html")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		//return err
@@ -58,18 +67,41 @@ func (h *handler) GetAllBookHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	id := r.FormValue("id")
-	book, err := h.service.GetBook(context.TODO(), id)
+	tmpl, err := template.ParseGlob("./internal/html/*.html")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		//return err
 	}
-	b, err := json.Marshal(book)
+
+	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		//return err
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+
+	err = tmpl.ExecuteTemplate(w, "book", nil)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+}
+
+func (h *handler) TestHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseGlob("./internal/html/*.html")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+
+	err = tmpl.ExecuteTemplate(w, "header", nil)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+
+	err = tmpl.ExecuteTemplate(w, "test", nil)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
 }
