@@ -273,15 +273,27 @@ main .main .link {
     width: 80%;
 }
 
-main .main .link div a:last-child {
-    font-weight: 700;
-}
-
 main .main .link div a {
     margin: 0 3px;
     text-decoration: none;
     color: rgba(0, 0, 0, 0.75);
     transition: color .1s linear;
+}
+
+main .main .link div a:after{
+    margin-left: 5px;
+    margin-right: -5px;
+    content: '/';
+}
+
+
+main .main .link div a:last-child {
+    font-weight: 700;
+
+}
+
+main .main .link div a:last-child::after {
+    content: "";
 }
 
 main .main .link div a:hover {

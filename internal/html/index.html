@@ -2,42 +2,54 @@
 
 
 <body>
-    <!-- <h1>Hello world</h1>
-    <form action="/book/" method="post">
-        <input type="text" name="id">
-        <input type="submit" value="OK">
-    </form> -->
 
     <div class="container">
         <main>
             <div class="category">
                 <div class="list">
-                    <span><a href="">hello</a></span>
-
+                     {{ if .Auth }}
+                    <span><a href="/user/profile">Мой профиль</a></span>
+                    <span><a href="/user/library">Отложенные</a></span>
+                    <span><a href="/user/favourites">Закладки</a></span>
+                    <hr>
+                    {{ end }}
+ 
+                    <span><a href="/books/genre/new">Новиники</a></span>
+                    <span><a href="/books/genre/all">Все жанры</a></span>
+                    <span><a href="/books/authors">Авторы</a></span>
+                    {{ range $_, $g := .Genres }}
+                    <span><a href="/books/genre/{{ $g.Link }}">{{ $g.Name }}</a></span>
+                    {{ end }}
                 </div>
             </div>
             <div class="main">
                 <div class="link">
-                    <div><a href="">Главная</a>/<a href="">Все жанры</a>/<a href="">Category</a></div>
+                    <div>
+                        {{ range $_, $u := .URL_NAME }}
+                        <a href='{{ index $.URLs $u }}'>{{ $u }}</a>
+                        {{ end }}
+                    </div>
                     <hr>
                 </div>
-                <h2>Новинки</h2>
+                <h2>{{ .Title }}</h2>
                 <div class="books">
+                    {{ range $_, $b := .Books }}
                     <div class="book">
                         <div class="img">
-                            <a href="">
-                                <img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt="обложка книги">
+                            <a href="/book/{{ $b.UUID }}">
+                                <img src="../../assets/image/book_covers/{{ $b.Photo }}" alt="обложка книги">
                             </a>   
                         </div>
                         <div class="content">
-                            <div class="name"><a href="">Цифровая фотография. Трюки и эффекты</a></div>
+                            <div class="name"><a href="/book/{{ $b.UUID }}">{{ $b.Name }}</a></div>
                             <div class="authors">
-                                <div><a href="">Александр Труханов</a></div>
-                                <div><a href="">Андрей Зарецкий</a></div>
+                                {{ range $_, $ba := $b.Authors }}
+                                <div><a href="{{ $ba.UUID }}">{{ $ba.Firstname }}  {{ $ba.Lastname }}</a></div>
+                                {{ end }}
                             </div>
                         </div>
                     </div>
-                    
+                    {{ end }}
                 </div>            
             </div>
         </main>

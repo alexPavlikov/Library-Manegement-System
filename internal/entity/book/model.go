@@ -4,10 +4,10 @@ type Book struct {
 	UUID        string
 	Name        string
 	Photo       string
-	Genre       []string
+	Genre       []Genre
 	Year        uint16
 	Pages       uint16
-	Rating      uint8
+	Rating      []Rating
 	Description string
 	PDFLink     string
 	Publishing  Publishing
@@ -39,4 +39,17 @@ type Awards struct {
 	UUID          string
 	Name          string
 	YearOfReceipt uint16
+}
+
+type Rating struct {
+	Id      string
+	Book_id string
+	User_id string
+	Rating  uint8
+}
+
+type Genre struct {
+	Id   string
+	Name string
+	Link string
 }

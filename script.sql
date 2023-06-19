@@ -11,7 +11,6 @@ CREATE TABLE public.book (
     photo VARCHAR(100) NOT NULL,
     year smallint NOT NULL,
     pages smallint NOT NULL,
-    rating smallint NOT NULL,
     description TEXT NOT NULL,
     pdf_link VARCHAR(100) NOT NULL,
     publishing UUID NOT NULL,
@@ -42,6 +41,16 @@ CREATE TABLE public.user (
     deleted boolean DEFAULT false
 );
 
+CREATE TABLE public.book_rating (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    book_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    rating smallint NOT NULL,
+    CONSTRAINT book_fk FOREIGN KEY (book_id) REFERENCES public.book(id),
+    CONSTRAINT user_fk FOREIGN KEY (user_id) REFERENCES public.user(id),
+    CONSTRAINT user_book_rating_unique UNIQUE (user_id, book_id)
+);
+
 CREATE TABLE public.user_favourites (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
@@ -63,6 +72,7 @@ CREATE TABLE public.book_authors (
 CREATE TABLE public.genre (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) NOT NULL,
+    link VARCHAR(50) NOT NULL,
     deleted boolean DEFAULT false
 );
 

@@ -86,30 +86,53 @@
         <main>
             <div class="category">
                 <div class="list">
-                    <span><a href="">hello</a></span>
-                    <!-- <hr> -->
+                    {{ if .Auth }}
+                   <span><a href="/user/profile">Мой профиль</a></span>
+                   <span><a href="/user/library">Отложенные</a></span>
+                   <span><a href="/user/favourites">Закладки</a></span>
+                   <hr>
+                   {{ end }}
 
-                </div>
+                   <span><a href="/books/genre/new">Новиники</a></span>
+                   <span><a href="/books/genre/all">Все жанры</a></span>
+                   <span><a href="/books/authors">Авторы</a></span>
+                   {{ range $_, $g := .Genres }}
+                   <span><a href="/books/genre/{{ $g.Link }}">{{ $g.Name }}</a></span>
+                   {{ end }}
+               </div>
             </div>
             <div class="main">
                 <div class="link">
-                    <div><a href="">Главная</a>/<a href="">Книги</a>/<a href="">Name</a></div>
+                    <div>
+                        {{ range $_, $u := .URL_NAME }}
+                        <a href='{{ index $.URLs $u }}'>{{ $u }}</a>
+                        {{ end }}
                     <hr>
+                    </div>
                 </div>
                 <div class="book-content">
-                    <h2 class="title">Hello world</h2>
+                    <h2 class="title">{{ .Title }}</h2>
                     <div class="book-content-colums">
+                    {{ range $_, $b := .Books }}
                         <div class="photo">
-                            <img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt="">
+                            <img src="../../assets/image/book_covers/{{$b.Photo}}" alt="">
                         </div>
                         <div class="info">
                             <div class="stat">
                                 <div class="stat-item">
-                                    <div><span class="margin-right">Name</span><span class="text">К себе нежно. Книга о том, как ценить и беречь себя</span></div>
-                                    <div><span class="margin-right">Author</span><span class="text"><a class="text" href="">hello</a></span></div>
-                                    <div><span class="margin-right">Genre</span><span class="text"><a class="text" href="">world</a></span></div>
-                                    <div><span class="margin-right">Year</span><span class="text">2002</span></div>
-                                    <div><span class="margin-right">Pages</span><span class="text">31</span></div>
+                                    <div><span class="margin-right">Name</span><span class="text">{{ $b.Name }}</span></div>
+                                    <div><span class="margin-right">Author</span><span class="text">
+                                        {{ range $_, $ba := $b.Authors }}
+                                        <a class="text" href="/books/authors/{{ $ba.UUID }}">{{ $ba.Firstname }} {{ $ba.Lastname }}</a>
+                                        {{ end }}
+                                    </span></div>
+                                    <div><span class="margin-right">Genre</span><span class="text">
+                                        {{ range $_, $bg := $b.Genre }}
+                                        <a class="text" href="/books/genre/{{ $bg.Link }}">{{ $bg.Name }}</a>
+                                        {{ end }}
+                                    </span></div>
+                                    <div><span class="margin-right">Year</span><span class="text">{{ $b.Year }}</span></div>
+                                    <div><span class="margin-right">Pages</span><span class="text">{{ $b.Pages }}</span></div>
                                     <div><span class="margin-right">Rating</span><span class="text">3.4 из 5</span></div>
                                     <div style="position: relative;"><span class="margin-right" style="margin-top: 12px;">Your votng</span><span class="text">
                                         <div style="padding: 0;" class="star-rating">
@@ -185,19 +208,19 @@
                             </div>
                             <div  class="stat">
                                 <h3>Описание</h3>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                                Ipsa, itaque. Repellendus quod exercitationem odit inventore ducimus laborum.
-                                Sapiente, mollitia. Maxime, fugit dolor commodi accusamus praesentium asperiores 
-                                odit ullam alias blanditiis!</p>
+                                <p>{{ $b.Description }}</p>
                             </div>
                         </div>
+                        <form action="/book/download" method="post">
+                            <input type="text" name="uuid" value="{{ $b.UUID }}" style="display: none;">
+                            <button class="read" type="submit">Читать книгу <i class="fa-solid fa-angle-right"></i></button>
+                        </form>
+                        {{ end }}
                     </div>
-                    <form action="" method="post">
-                        <button class="read" type="submit">Читать книгу <i class="fa-solid fa-angle-right"></i></button>
-                    </form>
+
                 </div>
                 <div class="link comment">
-                    <form action="" method="post" style="position: relative;">
+                    <form action="/book/comments/add" method="post" style="position: relative;">
                         <textarea name="comment" placeholder="Оставьте комментарий"></textarea>
                         <button class="comment-btn" type="submit">Отправить </button>
                         <div class="comment-btn link-comment">
@@ -207,7 +230,7 @@
 
                         </div>
                     </form>
-                    <div class="rules"><a style="font-weight: 400;" href="">Конфиденциальность</a> | <a style="font-weight: 400;" href="">Условия</a></div>
+                    <div class="rules"><a style="font-weight: 400;" href="">Конфиденциальность</a> <a style="font-weight: 400;" href="">Условия</a></div>
                 </div>
             </div>
         </main>
