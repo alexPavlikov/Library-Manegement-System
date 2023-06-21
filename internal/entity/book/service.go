@@ -34,6 +34,14 @@ func (s *Service) GetAllBooks(ctx context.Context) ([]Book, error) {
 	return books, nil
 }
 
+func (s *Service) GetNewBooks(ctx context.Context) ([]Book, error) {
+	books, err := s.repository.GetNewBooks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get new books, due to err: %v", err)
+	}
+	return books, nil
+}
+
 func (s *Service) GetMustPopularBooks(ctx context.Context) ([]Book, error) {
 	books, err := s.repository.GetMustPopularBooks(ctx)
 	if err != nil {

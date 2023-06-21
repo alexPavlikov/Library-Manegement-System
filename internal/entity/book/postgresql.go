@@ -2,6 +2,7 @@ package book
 
 import (
 	"context"
+	"time"
 
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/client/postgresql"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
@@ -148,6 +149,32 @@ func (r *repository) GetMustPopularBooks(ctx context.Context) ([]Book, error) {
 		// if err != nil {
 		// 	return books, err
 		// }
+		books = append(books, book)
+	}
+	return books, nil
+}
+
+func (r *repository) GetNewBooks(ctx context.Context) ([]Book, error) {
+	query := `
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.description, b.pdf_link, b.publishing, p.name
+	FROM public.book b
+	JOIN public.publishing p ON p.id = b.publishing
+	WHERE b.deleted = 'false' AND b.Year = $1 LIMIT 12;
+	`
+	year := time.Now().Format("2006")
+
+	rows, err := r.client.Query(ctx, query, year)
+	if err != nil {
+		return nil, err
+	}
+	var book Book
+	var books []Book
+	for rows.Next() {
+		err = rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name)
+		if err != nil {
+			return nil, err
+		}
+
 		books = append(books, book)
 	}
 	return books, nil

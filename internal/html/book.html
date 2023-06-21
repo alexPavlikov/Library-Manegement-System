@@ -93,9 +93,9 @@
                    <hr>
                    {{ end }}
 
-                   <span><a href="/books/genre/new">Новиники</a></span>
+                   <span><a href="/">Новиники</a></span>
                    <span><a href="/books/genre/all">Все жанры</a></span>
-                   <span><a href="/books/authors">Авторы</a></span>
+                   <span><a href="/authors">Авторы</a></span>
                    {{ range $_, $g := .Genres }}
                    <span><a href="/books/genre/{{ $g.Link }}">{{ $g.Name }}</a></span>
                    {{ end }}

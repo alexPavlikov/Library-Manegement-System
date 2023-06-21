@@ -38,6 +38,8 @@ CREATE TABLE public.user (
     age smallint NOT NULL,
     date_of_birth VARCHAR(30) NOT NULL, 
     gender VARCHAR(15) NOT NULL,
+    login VARCHAR(50) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
     deleted boolean DEFAULT false
 );
 

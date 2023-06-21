@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"strings"
 	"time"
 )
@@ -44,4 +45,24 @@ func FormatQuery(query string) string {
 
 func TrimSpace(url string) string {
 	return strings.ReplaceAll(url, " ", "_")
+}
+
+func DownloadBook(pathPDF string, userFile string) error {
+
+	r, err := os.Open(pathPDF)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+	w, err := os.Create(userFile)
+	if err != nil {
+		return err
+	}
+	defer w.Close()
+	_, err = w.ReadFrom(r)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

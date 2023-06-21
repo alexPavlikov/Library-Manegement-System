@@ -8,6 +8,7 @@ type Repository interface {
 	GetAllBooks(ctx context.Context) ([]Book, error)
 	GetMustPopularBooks(ctx context.Context) ([]Book, error)
 	GetAllBooksByGenre(ctx context.Context, genreUUID string) ([]Book, error)
+	GetNewBooks(ctx context.Context) ([]Book, error)
 	UpdateBook(ctx context.Context, book *Book) error
 	DeleteBook(ctx context.Context, uuid string) error
 	FindAllAuthorsByBook(ctx context.Context, uuid string) ([]Author, error)
