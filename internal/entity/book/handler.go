@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/alexPavlikov/Library-Manegement-System/internal/handlers"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
@@ -17,7 +18,7 @@ import (
 var (
 	Auth bool
 	//Genres    []Genre
-	GenresDTO Genres_DTO
+	Book_DTO DTO
 	//	URL_NAME = []string{"Главная"}
 	URL_MAP = map[string]string{"Главная": "/books", "Новинки": "/books/new", "Книги": "/books/all"}
 )
@@ -55,7 +56,7 @@ func (h *handler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 
-	GenresDTO.Genres, err = h.service.GetAllGenres(context.TODO())
+	Book_DTO.Genres, err = h.service.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -70,8 +71,7 @@ func (h *handler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	URL_NAME := []string{"Главная"}
-
-	page := map[string]interface{}{"Genres": GenresDTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Популярные", "Auth": false, "Books": books}
+	page := map[string]interface{}{"Genres": Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Популярные", "Auth": Book_DTO.Auth, "Books": books}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -112,7 +112,7 @@ func (h *handler) PopularBooksHandler(w http.ResponseWriter, r *http.Request) {
 
 	URL_NAME := []string{"Главная", "Все жанры"}
 
-	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Популярные", "Auth": false, "Books": books}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Популярные", "Auth": Book_DTO.Auth, "Books": books}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -189,7 +189,7 @@ func (h *handler) GenreHandler(w http.ResponseWriter, r *http.Request) {
 		URL_NAME = []string{"Главная", "Жанры", genre.Name}
 	}
 
-	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": genre.Name, "Auth": false, "Books": books}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": genre.Name, "Auth": Book_DTO.Auth, "Books": books}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -254,7 +254,13 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 	var books []Book
 	books = append(books, book)
 
-	page := map[string]interface{}{"Genres": genres, "Books": books, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": book.Name, "Auth": false}
+	comments, ok, err := h.service.GetAllCommentByBook(context.TODO(), book.UUID, Book_DTO.User_id)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	page := map[string]interface{}{"Genres": genres, "Books": books, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": book.Name, "Auth": Book_DTO.Auth, "User": Book_DTO.User_id, "Comments": comments, "ComOK": ok}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -273,9 +279,18 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	text := r.FormValue("comment")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(text))
+	var comment Comment
+	comment.User_id = r.FormValue("user")
+	comment.Book_id = r.FormValue("book")
+	comment.Text = r.FormValue("comment")
+	comment.Time = time.Now().Format("2006-01-02 15:04")
+	fmt.Println("COMMENT", comment)
+	err := h.service.CreateCommentForBook(context.TODO(), &comment)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	http.Redirect(w, r, fmt.Sprintf("/book/%s", comment.Book_id), http.StatusSeeOther)
 }
 
 func (h *handler) BookDownloadHandler(w http.ResponseWriter, r *http.Request) {

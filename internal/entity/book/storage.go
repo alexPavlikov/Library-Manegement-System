@@ -16,4 +16,6 @@ type Repository interface {
 	FindAllAwardsByBook(ctx context.Context, uuid string) ([]Awards, error)
 	GetAllGenres(ctx context.Context) ([]Genre, error)
 	GetGenreByLink(ctx context.Context, link string) (Genre, error)
+	CreateCommentForBook(ctx context.Context, comment *Comment) error
+	GetAllComment(ctx context.Context, book_uuid string, user_uuid string) ([]Comment, bool, error)
 }

@@ -53,3 +53,13 @@ type Genre struct {
 	Name string
 	Link string
 }
+
+type Comment struct {
+	Id        string
+	Book_id   string
+	User_id   string
+	Text      string
+	Time      string
+	Firstname string
+	Lastname  string
+}

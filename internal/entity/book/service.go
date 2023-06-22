@@ -107,3 +107,21 @@ func (s *Service) FindAllAuthorsByBook(ctx context.Context, id string) ([]Author
 	}
 	return authors, nil
 }
+
+// comments
+
+func (s *Service) CreateCommentForBook(ctx context.Context, comment *Comment) error {
+	err := s.repository.CreateCommentForBook(ctx, comment)
+	if err != nil {
+		return fmt.Errorf("failed to create comment for book, due to err: %v", err)
+	}
+	return nil
+}
+
+func (s *Service) GetAllCommentByBook(ctx context.Context, book_uuid string, user_uuid string) ([]Comment, bool, error) {
+	comments, ok, err := s.repository.GetAllComment(ctx, book_uuid, user_uuid)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to get all comments by book, due to err; %v", err)
+	}
+	return comments, ok, nil
+}

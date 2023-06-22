@@ -46,7 +46,7 @@ func (h *handler) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 	URL_NAME := []string{"Главная", "Вход | Регистрация"}
 
-	page := map[string]interface{}{"Genres": book.GenresDTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Auth": false, "Auth_title": "Войти в аккаунт", "Reg_title": "Регистрация"}
+	page := map[string]interface{}{"Genres": book.Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Auth": book.Book_DTO.Auth, "Auth_title": "Войти в аккаунт", "Reg_title": "Регистрация"}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -82,7 +82,8 @@ func (h *handler) UserRegHandler(w http.ResponseWriter, r *http.Request) {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 	}
-
+	book.Book_DTO.Auth = true
+	book.Book_DTO.User_id = user.Id
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 func (h *handler) UserAuthHandler(w http.ResponseWriter, r *http.Request) {
@@ -97,5 +98,7 @@ func (h *handler) UserAuthHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 	fmt.Println(user)
+	book.Book_DTO.Auth = true
+	book.Book_DTO.User_id = user.Id
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

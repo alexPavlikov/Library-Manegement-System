@@ -371,6 +371,55 @@ func (r *repository) GetGenreByLink(ctx context.Context, link string) (Genre, er
 	return genre, nil
 }
 
+// comments
+func (r *repository) CreateCommentForBook(ctx context.Context, comment *Comment) error {
+	query := `
+	INSERT INTO public.comments
+	(book_id, user_id, comment, time)
+	VALUES ($1, $2, $3, $4)
+	RETURNING id
+	`
+
+	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	err := r.client.QueryRow(ctx, query, comment.Book_id, comment.User_id, comment.Text, comment.Time).Scan(&comment.Id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *repository) GetAllComment(ctx context.Context, book_uuid string, user_uuid string) ([]Comment, bool, error) {
+	query := `
+	SELECT c.id, c.book_id, c.user_id, c.comment, c.time, u.firstname, u.lastname
+	FROM public.comments c
+	JOIN public.user u ON c.user_id = u.id
+	WHERE c.deleted = 'false' AND c.book_id = $1
+	`
+
+	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	rows, err := r.client.Query(ctx, query, book_uuid)
+	if err != nil {
+		return nil, false, err
+	}
+	var comment Comment
+	var comments []Comment
+	var ok bool = false
+	for rows.Next() {
+		err = rows.Scan(&comment.Id, &comment.Book_id, &comment.User_id, &comment.Text, &comment.Time, &comment.Firstname, &comment.Lastname)
+		if err != nil {
+			return nil, false, err
+		}
+		if comment.User_id == user_uuid {
+			ok = true
+		}
+		comments = append(comments, comment)
+	}
+	return comments, ok, nil
+}
+
 func NewRepository(client postgresql.Client, logger *logging.Logger) Repository {
 	return &repository{
 		client: client,
