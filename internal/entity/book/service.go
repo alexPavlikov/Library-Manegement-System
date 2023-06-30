@@ -66,6 +66,14 @@ func (s *Service) GetAllBooksByGenre(ctx context.Context, uuid string) ([]Book, 
 	return books, nil
 }
 
+func (s *Service) GetBookByName(ctx context.Context, name string) ([]Book, error) {
+	book, err := s.repository.GetBookByName(ctx, name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get book by name, due to err: %v", err)
+	}
+	return book, nil
+}
+
 func (s *Service) UpdateBook(ctx context.Context, book *Book) error {
 	err := s.repository.UpdateBook(ctx, book)
 	if err != nil {

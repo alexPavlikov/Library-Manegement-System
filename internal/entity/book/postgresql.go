@@ -2,6 +2,7 @@ package book
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/client/postgresql"
@@ -212,6 +213,52 @@ func (r *repository) GetOneBook(ctx context.Context, uuid string) (Book, error) 
 	return book, nil
 }
 
+func (r *repository) GetBookByName(ctx context.Context, name string) ([]Book, error) {
+	data := "%" + name + "%"
+	var dataCaps string
+	for i, v := range data {
+		if i == 1 {
+			dataCaps += strings.ToUpper(string(v))
+		} else {
+			dataCaps += string(v)
+		}
+	}
+	query := `
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.description, b.pdf_link, b.publishing, p.name  
+	FROM public.book b
+	JOIN public.publishing p ON p.id = b.publishing
+	WHERE b.deleted = 'false' AND b.name LIKE $1 OR b.name LIKE $2;
+	`
+
+	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	rows, err := r.client.Query(ctx, query, data, dataCaps)
+	if err != nil {
+		return nil, err
+	}
+	var books []Book
+	for rows.Next() {
+		var book Book
+		err = rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		book.Authors, err = r.FindAllAuthorsByBook(ctx, book.UUID)
+		if err != nil {
+			return nil, err
+		}
+		book.Genre, err = r.FindAllGenreByBook(ctx, book.UUID)
+		if err != nil {
+			return nil, err
+		}
+
+		books = append(books, book)
+
+	}
+	return books, nil
+}
+
 // Update implements Repository.
 func (r *repository) UpdateBook(ctx context.Context, book *Book) error {
 	query := `
@@ -245,6 +292,8 @@ func (r *repository) DeleteBook(ctx context.Context, uuid string) error {
 	}
 	return nil
 }
+
+//--------
 
 func (r *repository) FindAllAuthorsByBook(ctx context.Context, uuid string) ([]Author, error) {
 	query := `

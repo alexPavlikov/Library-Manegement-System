@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/alexPavlikov/Library-Manegement-System/internal/config"
+	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/author"
 	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/book"
 	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/user"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/client/postgresql"
@@ -38,6 +39,12 @@ func Run() {
 	userService := user.NewService(logger, userRep)
 	userHandler := user.NewHandler(logger, userService)
 	userHandler.Register(router)
+
+	logger.Info("Register author handlers")
+	authorRep := author.NewRepository(clientPostgreSQL, logger)
+	authorService := author.NewService(logger, authorRep)
+	authorHandler := author.NewHandler(authorService, logger)
+	authorHandler.Register(router)
 
 	start(router, cfg)
 

@@ -61,8 +61,9 @@
                    {{ end }}
 
                    <span><a href="/">Новиники</a></span>
+                   <span><a href="/books/">Популярные</a></span>
                    <span><a href="/books/genre/all">Все жанры</a></span>
-                   <span><a href="/authors">Авторы</a></span>
+                   <span><a href="/authors/">Авторы</a></span>
                    {{ range $_, $g := .Genres }}
                    <span><a href="/books/genre/{{ $g.Link }}">{{ $g.Name }}</a></span>
                    {{ end }}
@@ -90,7 +91,7 @@
                                     <div><span class="margin-right">Name</span><span class="text">{{ $b.Name }}</span></div>
                                     <div><span class="margin-right">Author</span><span class="text">
                                         {{ range $_, $ba := $b.Authors }}
-                                        <a class="text" href="/books/authors/{{ $ba.UUID }}">{{ $ba.Firstname }} {{ $ba.Lastname }}</a>
+                                        <a class="text" href="/author/{{ $ba.UUID }}">{{ $ba.Firstname }} {{ $ba.Lastname }}</a>
                                         {{ end }}
                                     </span></div>
                                     <div><span class="margin-right">Genre</span><span class="text">

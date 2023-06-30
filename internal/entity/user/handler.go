@@ -1,7 +1,9 @@
 package user
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -13,7 +15,7 @@ import (
 )
 
 var (
-	URL_MAP = map[string]string{"Главная": "/books", "Новинки": "/books/new", "Книги": "/books/all", "Вход/Регистрация": "/user/"}
+	URL_MAP = map[string]string{"Главная": "/", "Книги": "/books/genre/all", "Вход/Регистрация": "/user/", "Жанры": "/books/genre/all", "Популярные": "/books/", "Авторы": "/authors/"}
 )
 
 type handler struct {
@@ -34,6 +36,7 @@ func (h *handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodGet, "/user/", h.UserProfileHandler)
 	router.HandlerFunc(http.MethodPost, "/user/reg", h.UserRegHandler)
 	router.HandlerFunc(http.MethodPost, "/user/auth", h.UserAuthHandler)
+	router.HandlerFunc(http.MethodPost, "/user/find", h.UserFindHandler)
 }
 
 func (h *handler) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -101,4 +104,50 @@ func (h *handler) UserAuthHandler(w http.ResponseWriter, r *http.Request) {
 	book.Book_DTO.Auth = true
 	book.Book_DTO.User_id = user.Id
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *handler) UserFindHandler(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+
+	key := r.FormValue("category_find")
+	text := r.FormValue("find")
+
+	type R struct {
+		Key  string
+		Text string
+	}
+
+	if key == "Книги" {
+		var req R
+		req.Key = key
+		req.Text = text
+		data, err := json.Marshal(req)
+		if err != nil {
+			h.logger.Tracef("failed: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		read := bytes.NewReader(data)
+		_, err = http.Post("http://localhost:10000/books/find/", "application/json", read)
+		if err != nil {
+			h.logger.Tracef("failed: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		http.Redirect(w, r, "/books/find/", http.StatusSeeOther)
+	} else {
+		var req R
+		req.Key = key
+		req.Text = text
+		data, err := json.Marshal(req)
+		if err != nil {
+			h.logger.Tracef("failed: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		read := bytes.NewReader(data)
+		_, err = http.Post("http://localhost:10000/authors/find/", "application/json", read)
+		if err != nil {
+			h.logger.Tracef("failed: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		http.Redirect(w, r, "/authors/find/", http.StatusSeeOther)
+	}
 }

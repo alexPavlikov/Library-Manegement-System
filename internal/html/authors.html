@@ -1,0 +1,116 @@
+{{ define "authors" }}
+
+<link rel="stylesheet" href="../../assets/css/author.css">
+
+<body>
+
+    <div class="container">
+        <main>
+            <div class="category">
+                <div class="list">
+                     {{ if .Auth }}
+                    <span><a href="/user/">Мой профиль</a></span>
+                    <span><a href="/user/library">Отложенные</a></span>
+                    <span><a href="/user/favourites">Закладки</a></span>
+                    <hr>
+                    {{ end }}
+ 
+                    <span><a href="/">Новиники</a></span>
+                    <span><a href="/books/">Популярные</a></span>
+                    <span><a href="/books/genre/all">Все жанры</a></span>
+                    <span><a href="/authors/">Авторы</a></span>
+                    {{ range $_, $g := .Genres }}
+                    <span><a href="/books/genre/{{ $g.Link }}">{{ $g.Name }}</a></span>
+                    {{ end }}
+                </div>
+            </div>
+            <div class="main">
+                <div class="link">
+                    <div>
+                        {{ range $_, $u := .URL_NAME }}
+                        <a href='{{ index $.URLs $u }}'>{{ $u }}</a>
+                        {{ end }}
+                    </div>
+                    <hr>
+                </div>
+
+                <h2>{{ .Title }}</h2>
+
+                <div class="links">
+                    <div class="alphabet">
+                        <a class="alphabet-link" href="/">[Все]</a>
+                        <a class="alphabet-link" href="/">[A]</a>
+                        <a class="alphabet-link" href="/">[B]</a>
+                        <a class="alphabet-link" href="/">[C]</a>
+                        <a class="alphabet-link" href="/">[D]</a>
+                        <a class="alphabet-link" href="/">[E]</a>
+                        <a class="alphabet-link" href="/">[F]</a>
+                        <a class="alphabet-link" href="/">[G]</a>
+                        <a class="alphabet-link" href="/">[H]</a>
+                        <a class="alphabet-link" href="/">[I]</a>
+                    </div>
+                </div>
+                <div class="authors">
+                    <div class="flex-row">
+                        <div class="person">
+                            <a href="/author/" class="name">Александр Пушкин</a>
+                            <span class="len">12 книг</span>
+                        </div>
+                        <div class="person-book">
+                            <div class="grid">
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                </div>
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                </div>
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                </div>
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">hrthrthrthtrhrthrd hrthrthrthrthrhtr hrthrthrthrthrt</div></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="flex-row">
+                        <div class="person">
+                            <a href="" class="name">Александр Пушкин</a>
+                            <span class="len">12 книг</span>
+                        </div>
+                        <div class="person-book">
+                            <div class="grid">
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                </div>
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                </div>
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                </div>
+                                <div class="grid-item">
+                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href=""><div class="book-name">hrthrthrthtrhrthrd hrthrthrthrthrhtr hrthrthrthrthrt</div></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    {{ range $_, $a := .Authors }}
+                        
+                    {{ end }}
+                </div>            
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+
+{{ end }}
