@@ -16,6 +16,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+var ClientPostgreSQL postgresql.Client
+
 func Run() {
 	logger := logging.GetLogger()
 	logger.Info("Create router")
@@ -23,25 +25,27 @@ func Run() {
 
 	cfg := config.GetConfig()
 
-	clientPostgreSQL, err := postgresql.NewClient(context.TODO(), cfg.Storage)
+	var err error
+
+	ClientPostgreSQL, err = postgresql.NewClient(context.TODO(), cfg.Storage)
 	if err != nil {
 		logger.Fatalf("failed to get new client postgresql, due to err: %v", err)
 	}
 
 	logger.Info("Register book handlers")
-	bookRep := book.NewRepository(clientPostgreSQL, logger)
+	bookRep := book.NewRepository(ClientPostgreSQL, logger)
 	bookService := book.NewService(logger, bookRep)
 	bookHandler := book.NewHandler(logger, bookService)
 	bookHandler.Register(router)
 
 	logger.Info("Register user handlers")
-	userRep := user.NewRepository(clientPostgreSQL, logger)
+	userRep := user.NewRepository(ClientPostgreSQL, logger)
 	userService := user.NewService(logger, userRep)
 	userHandler := user.NewHandler(logger, userService)
 	userHandler.Register(router)
 
 	logger.Info("Register author handlers")
-	authorRep := author.NewRepository(clientPostgreSQL, logger)
+	authorRep := author.NewRepository(ClientPostgreSQL, logger)
 	authorService := author.NewService(logger, authorRep)
 	authorHandler := author.NewHandler(authorService, logger)
 	authorHandler.Register(router)

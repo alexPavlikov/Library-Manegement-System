@@ -1,10 +1,12 @@
 package book
 
+import "github.com/alexPavlikov/Library-Manegement-System/internal/entity/genre"
+
 type Book struct {
 	UUID        string
 	Name        string
 	Photo       string
-	Genre       []Genre
+	Genre       []genre.Genre
 	Year        uint16
 	Pages       uint16
 	Rating      []Rating

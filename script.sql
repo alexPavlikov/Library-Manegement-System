@@ -22,6 +22,7 @@ CREATE TABLE public.author (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100) NOT NULL,
+    patronymic VARCHAR(100) NOT NULL,
     photo VARCHAR(50) NOT NULL,
     birth_place VARCHAR(100) NOT NULL,
     age smallint NOT NULL,
@@ -29,6 +30,20 @@ CREATE TABLE public.author (
     date_of_death VARCHAR(30),
     gender VARCHAR(15) NOT NULL,
     deleted boolean DEFAULT false
+);
+
+CREATE TABLE public.author_boigraphy (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    author_id UUID NOT NULL,
+    born text NOT NULL,
+    childhood text NOT NULL,
+    study text NOT NULL,
+    beginning_of_creativity text NOT NULL,
+    peak_of_creativity text,
+    death text,
+
+    CONSTRAINT author_fk FOREIGN KEY (author_id) REFERENCES public.author(id),
+    CONSTRAINT author_unique UNIQUE (author_id)
 );
 
 CREATE TABLE public.user (

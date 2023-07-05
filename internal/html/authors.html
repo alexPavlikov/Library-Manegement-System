@@ -51,32 +51,25 @@
                     </div>
                 </div>
                 <div class="authors">
+                    {{ range $_, $a := .Authors }}
                     <div class="flex-row">
                         <div class="person">
-                            <a href="/author/" class="name">Александр Пушкин</a>
-                            <span class="len">12 книг</span>
+                            <a href="/author/{{$a.UUID}}" class="name">{{ $a.Firstname }} {{ $a.Lastname }}</a>
+                           
+                            <span class="len">{{len $a.Books }} книг(а/и)</span>
                         </div>
                         <div class="person-book">
                             <div class="grid">
+                                {{ range $_, $ba := $a.Books }}
                                 <div class="grid-item">
-                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
-                                    <a class="name" href=""><div class="book-name">Akex</div></a>
+                                    <a href="/book/{{$ba.UUID}}"><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                                    <a class="name" href="/book/{{$ba.UUID}}"><div class="book-name">{{ $ba.Name }}</div></a>
                                 </div>
-                                <div class="grid-item">
-                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
-                                    <a class="name" href=""><div class="book-name">Akex</div></a>
-                                </div>
-                                <div class="grid-item">
-                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
-                                    <a class="name" href=""><div class="book-name">Akex</div></a>
-                                </div>
-                                <div class="grid-item">
-                                    <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
-                                    <a class="name" href=""><div class="book-name">hrthrthrthtrhrthrd hrthrthrthrthrhtr hrthrthrthrthrt</div></a>
-                                </div>
+                                {{ end }}
                             </div>
                         </div>
                     </div>
+                    {{ end }}
                     <!-- <div class="flex-row">
                         <div class="person">
                             <a href="" class="name">Александр Пушкин</a>

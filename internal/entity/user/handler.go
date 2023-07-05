@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/book"
+	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/genre"
 	"github.com/alexPavlikov/Library-Manegement-System/internal/handlers"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
 	"github.com/julienschmidt/httprouter"
@@ -47,9 +48,16 @@ func (h *handler) UserProfileHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 
+	genres, err := genre.GetAllGenres(context.TODO())
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+
 	URL_NAME := []string{"Главная", "Вход | Регистрация"}
 
-	page := map[string]interface{}{"Genres": book.Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Auth": book.Book_DTO.Auth, "Auth_title": "Войти в аккаунт", "Reg_title": "Регистрация"}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Auth": book.Book_DTO.Auth, "Auth_title": "Войти в аккаунт", "Reg_title": "Регистрация"}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {

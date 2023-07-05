@@ -2,6 +2,7 @@ package author
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/client/postgresql"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
@@ -22,7 +23,7 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) Repository 
 
 func (r *repository) GetAuthors(ctx context.Context) ([]Author, error) {
 	query := `
-	SELECT id, firstname, lastname, photo, birth_place, age, date_of_birth, date_of_death, gender
+	SELECT id, firstname, lastname, patronymic, photo, birth_place, age, date_of_birth, date_of_death, gender
 	FROM public.author
 	WHERE deleted = 'false';
 	`
@@ -36,14 +37,14 @@ func (r *repository) GetAuthors(ctx context.Context) ([]Author, error) {
 	var authors []Author
 	for rows.Next() {
 		var author Author
-		err = rows.Scan(&author.UUID, &author.Firstname, &author.Lastname, &author.Photo, &author.BirthPlace, &author.Age, &author.DateOfBirth, &author.DateOfDeath, &author.Gender)
+		err = rows.Scan(&author.UUID, &author.Firstname, &author.Patronymic, &author.Lastname, &author.Photo, &author.BirthPlace, &author.Age, &author.DateOfBirth, &author.DateOfDeath, &author.Gender)
 		if err != nil {
 			return nil, err
 		}
-		//author.Books, err = GetAllAuthorsBooks()
-		// if err != nil {
-		// 	return nil, err
-		// }
+		author.Books, err = r.FindAllBookByAuthors(ctx, author.UUID)
+		if err != nil {
+			return nil, err
+		}
 
 		//author.Awards  = GetAllAuthorsAwards()
 		// if err != nil {
@@ -57,7 +58,7 @@ func (r *repository) GetAuthors(ctx context.Context) ([]Author, error) {
 
 func (r *repository) GetAuthor(ctx context.Context, uuid string) (Author, error) {
 	query := `
-	SELECT id, firstname, lastname, photo, birth_place, age, date_of_birth, date_of_death, gender
+	SELECT id, firstname, lastname, patronymic, photo, birth_place, age, date_of_birth, date_of_death, gender
 	FROM public.author
 	WHERE deleted = 'false' AND id = $1;
 	`
@@ -71,7 +72,7 @@ func (r *repository) GetAuthor(ctx context.Context, uuid string) (Author, error)
 	var author Author
 	for rows.Next() {
 
-		err = rows.Scan(&author.UUID, &author.Firstname, &author.Lastname, &author.Photo, &author.BirthPlace, &author.Age, &author.DateOfBirth, &author.DateOfDeath, &author.Gender)
+		err = rows.Scan(&author.UUID, &author.Firstname, &author.Lastname, &author.Patronymic, &author.Photo, &author.BirthPlace, &author.Age, &author.DateOfBirth, &author.DateOfDeath, &author.Gender)
 		if err != nil {
 			return Author{}, err
 		}
@@ -90,27 +91,86 @@ func (r *repository) GetAuthor(ctx context.Context, uuid string) (Author, error)
 }
 
 func (r *repository) GetAuthorByName(ctx context.Context, name string) ([]Author, error) {
+	newName := "%" + name + "%"
 	query := `
-	SELECT id, firstname, lastname, photo, birth_place, age, date_of_birth, date_of_death, gender
+	SELECT id, firstname, lastname, patronymic, photo, birth_place, age, date_of_birth, date_of_death, gender
 	FROM public.author
-	WHERE firstname = $1 OR lastname = $1
+	WHERE firstname LIKE $1 OR lastname LIKE $2 AND deleted = 'false'
 	`
 
 	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
 
-	rows, err := r.client.Query(ctx, query, name)
+	var author Author
+	var authors []Author
+
+	rows, err := r.client.Query(ctx, query, newName, newName)
+	if err != nil {
+		fmt.Println("Error ", err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&author.UUID, &author.Firstname, &author.Lastname, &author.Patronymic, &author.Photo, &author.BirthPlace, &author.Age, &author.DateOfBirth, &author.DateOfDeath, &author.Gender)
+		if err != nil {
+			fmt.Println("Error ", err)
+			return nil, err
+		}
+		author.Books, err = r.FindAllBookByAuthors(ctx, author.UUID)
+		if err != nil {
+			fmt.Println("Error ", err)
+			return nil, err
+		}
+		authors = append(authors, author)
+	}
+	return authors, nil
+}
+
+func (r *repository) FindAllBookByAuthors(ctx context.Context, uuid string) ([]Book, error) {
+	query := `
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.description, b.pdf_link, b.publishing, p.name  
+	FROM public.book b
+	JOIN public.publishing p ON p.id = b.publishing
+	JOIN public.book_authors ba on ba.author_id = $1 AND ba.book_id = b.id
+	WHERE b.deleted = 'false';
+	`
+
+	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	rows, err := r.client.Query(ctx, query, uuid)
 	if err != nil {
 		return nil, err
 	}
-	var author Author
-	var authors []Author
+	var books []Book
 	for rows.Next() {
-		err = rows.Scan(&author.UUID, &author.Firstname, &author.Lastname, &author.Photo, &author.BirthPlace, &author.Age, &author.DateOfBirth, &author.DateOfDeath, &author.Gender)
+		var book Book
+		err = rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name)
 		if err != nil {
 			return nil, err
 		}
 
-		authors = append(authors, author)
+		books = append(books, book)
+
 	}
-	return authors, nil
+	return books, nil
+}
+
+func (r *repository) FindBiographyAuthor(ctx context.Context, uuid string) ([]string, error) {
+	query := `
+	SELECT born, childhood,	study, beginning_of_creativity,	peak_of_creativity,	death
+	FROM public.author_boigraphy
+	WHERE author_id = $1
+	`
+
+	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	var a, b, c, d, e, f string
+	var text []string
+
+	err := r.client.QueryRow(ctx, query, uuid).Scan(&a, &b, &c, &d, &e, &f)
+	if err != nil {
+		return nil, err
+	}
+	text = append(text, a, b, c, d, e, f)
+
+	return text, nil
 }

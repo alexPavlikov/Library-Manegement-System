@@ -1,7 +1,7 @@
 package book
 
 type DTO struct {
-	Genres  []Genre
+	// Genres  []genre.Genre
 	Auth    bool
 	User_id string
 }

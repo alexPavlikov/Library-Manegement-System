@@ -42,3 +42,12 @@ func (s *Service) GetAuthorByName(ctx context.Context, name string) ([]Author, e
 	}
 	return authors, nil
 }
+
+func (s *Service) FindBiography(ctx context.Context, uuid string) ([]string, error) {
+	text, err := s.repository.FindBiographyAuthor(ctx, uuid)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find bio, due to err: %v", err)
+	}
+
+	return text, nil
+}

@@ -2,7 +2,7 @@
 
 <link rel="stylesheet" href="../../assets/css/book.css">
 
-
+<link rel="stylesheet" href="../../assets/css/biography.css">
 
 
 <body>
@@ -37,6 +37,49 @@
                     <hr>
                 </div>
                 <h2>{{ .Title }}</h2>
+
+                <div class="biography">
+                    <div class="info">
+                        <div class="img">
+                            <img src="../../assets/image/authors/{{ .Author.Photo }}" alt="">
+                        </div>
+                        <div class="stat">
+                            <div class="name"><span class="text">Фамилия:</span> <span>{{ .Author.Lastname }}</span></div>
+                            <div class="name"><span class="text">Имя:</span> <span>{{ .Author.Firstname }}</span></div>
+                            <div class="name"><span class="text">Отчество:</span> <span>{{ .Author.Patronymic }}</span></div>
+                            <div class="name"><span class="text">Дата рождения:</span> <span>{{ .Author.DateOfBirth }}</span></div>
+                            <div class="name"><span class="text">Дата смерти:</span> <span>{{ .Author.DateOfDeath}}</span></div>
+                            <div class="name"><span class="text">Место рождения:</span> <span>{{ .Author.BirthPlace }}</span></div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        {{ range $_, $t := .Text }}
+                        <p>
+                            {{$t}}
+                        </p>
+                        {{ end }}
+                    </div>
+                    <h3>Главные книги автора</h3>
+                    <div class="book-list">
+                        <div class="book-item">
+                            <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                            <a href="">Name</a>
+                        </div>
+                        <div class="book-item">
+                            <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                            <a href="">Name</a>
+                        </div>
+                        <div class="book-item">
+                            <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                            <a href="">Name</a>
+                        </div>
+                        <div class="book-item">
+                            <a href=""><img src="../../assets/image/book_covers/thumb__301_481_0_0_crop.jpg" alt=""></a>
+                            <a href="">Name</a>
+                        </div>
+                    </div>
+                </div>
+
             </div>    
         </main>
     </div>    

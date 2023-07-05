@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/genre"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/client/postgresql"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/utils"
@@ -61,7 +62,8 @@ func (r *repository) GetAllBooks(ctx context.Context) ([]Book, error) {
 		if err != nil {
 			return Books, err
 		}
-		book.Genre, err = r.FindAllGenreByBook(ctx, book.UUID)
+
+		book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
 		if err != nil {
 			return Books, err
 		}
@@ -101,7 +103,7 @@ func (r *repository) GetAllBooksByGenre(ctx context.Context, genreUUID string) (
 		if err != nil {
 			return Books, err
 		}
-		book.Genre, err = r.FindAllGenreByBook(ctx, book.UUID)
+		book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
 		if err != nil {
 			return Books, err
 		}
@@ -142,7 +144,7 @@ func (r *repository) GetMustPopularBooks(ctx context.Context) ([]Book, error) {
 		if err != nil {
 			return books, err
 		}
-		book.Genre, err = r.FindAllGenreByBook(ctx, book.UUID)
+		book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
 		if err != nil {
 			return books, err
 		}
@@ -201,7 +203,7 @@ func (r *repository) GetOneBook(ctx context.Context, uuid string) (Book, error) 
 	if err != nil {
 		return Book{}, err
 	}
-	book.Genre, err = r.FindAllGenreByBook(ctx, uuid)
+	book.Genre, err = genre.FindAllGenreByBook(ctx, uuid)
 	if err != nil {
 		return Book{}, err
 	}
@@ -248,7 +250,7 @@ func (r *repository) GetBookByName(ctx context.Context, name string) ([]Book, er
 		if err != nil {
 			return nil, err
 		}
-		book.Genre, err = r.FindAllGenreByBook(ctx, book.UUID)
+		book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
 		if err != nil {
 			return nil, err
 		}
@@ -347,77 +349,6 @@ func (r *repository) FindAllAwardsByBook(ctx context.Context, uuid string) ([]Aw
 	}
 
 	return awards, nil
-}
-
-//Book genre
-
-func (r *repository) GetAllGenres(ctx context.Context) ([]Genre, error) {
-	query := `
-	SELECT name, link
-	FROM public.genre
-	WHERE deleted = false
-	`
-
-	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
-
-	rows, err := r.client.Query(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	var genre Genre
-	var genres []Genre
-	for rows.Next() {
-		err = rows.Scan(&genre.Name, &genre.Link)
-		if err != nil {
-			return nil, err
-		}
-		genres = append(genres, genre)
-	}
-	return genres, nil
-}
-
-func (r *repository) FindAllGenreByBook(ctx context.Context, uuid string) ([]Genre, error) {
-	query := `
-	SELECT g.name, g.link FROM public.book_genres bg
-	JOIN public.genre g ON g.id = bg.genre_id
-	WHERE book_id = $1;
-	`
-
-	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
-
-	rows, err := r.client.Query(ctx, query, uuid)
-	if err != nil {
-		return nil, err
-	}
-	var genres []Genre
-	for rows.Next() {
-		var g Genre
-		err = rows.Scan(&g.Name, &g.Link)
-		if err != nil {
-			return nil, err
-		}
-		genres = append(genres, g)
-	}
-	return genres, nil
-}
-
-func (r *repository) GetGenreByLink(ctx context.Context, link string) (Genre, error) {
-	query := `
-	SELECT 
-		id, name, link 
-	FROM public.genre
-		WHERE link = $1
-	`
-
-	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
-
-	rows := r.client.QueryRow(ctx, query, link)
-	var genre Genre
-	err := rows.Scan(&genre.Id, &genre.Name, &genre.Link)
-	if err != nil {
-		return Genre{}, err
-	}
-	return genre, nil
 }
 
 // comments

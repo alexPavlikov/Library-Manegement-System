@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/genre"
 	"github.com/alexPavlikov/Library-Manegement-System/internal/handlers"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/utils"
@@ -60,7 +61,7 @@ func (h *handler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 
-	Book_DTO.Genres, err = h.service.GetAllGenres(context.TODO())
+	Genres, err := genre.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -75,7 +76,7 @@ func (h *handler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	URL_NAME := []string{"Главная"}
-	page := map[string]interface{}{"Genres": Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": Book_DTO.Auth, "Books": books}
+	page := map[string]interface{}{"Genres": Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": Book_DTO.Auth, "Books": books}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -107,7 +108,7 @@ func (h *handler) PopularBooksHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 
-	genres, err := h.service.GetAllGenres(context.TODO())
+	genres, err := genre.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -141,7 +142,7 @@ func (h *handler) GenreHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 
-	genres, err := h.service.GetAllGenres(context.TODO())
+	genresArr, err := genre.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -151,21 +152,20 @@ func (h *handler) GenreHandler(w http.ResponseWriter, r *http.Request) {
 	link := strings.TrimPrefix(r.URL.Path, "/books/genre/")
 
 	var books []Book
-	var genre Genre
+	var genres genre.Genre
 	var URL_NAME []string
 
 	if link == "all" {
 
-		if link == "all" {
-			books, err = h.service.GetAllBooks(context.TODO())
-			if err != nil {
-				h.logger.Tracef("failed: %v", err)
-				w.WriteHeader(http.StatusBadRequest)
-				//return err
-			}
-			URL_NAME = []string{"Главная", "Все жанры"}
-			genre.Name = "Все жанры"
-		} // else {
+		books, err = h.service.GetAllBooks(context.TODO())
+		if err != nil {
+			h.logger.Tracef("failed: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			//return err
+		}
+		URL_NAME = []string{"Главная", "Все жанры"}
+		//genres.Name = "Все жанры"
+		// else {
 		// 	books, err = h.service.GetNewBooks(context.TODO())
 		// 	if err != nil {
 		//		h.logger.Tracef("failed: %v", err)
@@ -177,23 +177,23 @@ func (h *handler) GenreHandler(w http.ResponseWriter, r *http.Request) {
 		// }
 
 	} else {
-		genre, err = h.service.GetGenreByLink(context.TODO(), link)
+		genres, err = genre.GetGenreByLink(context.TODO(), link)
 		if err != nil {
 			h.logger.Tracef("failed: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			//return err
 		}
-
-		books, err = h.service.GetAllBooksByGenre(context.TODO(), genre.Id)
+		fmt.Println("GENRE!!!!!!!!!!!!!", genres)
+		books, err = h.service.GetAllBooksByGenre(context.TODO(), genres.Id)
 		if err != nil {
 			h.logger.Tracef("failed: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			//return err
 		}
-		URL_NAME = []string{"Главная", "Жанры", genre.Name}
+		URL_NAME = []string{"Главная", "Жанры", genres.Name}
 	}
 
-	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": genre.Name, "Auth": Book_DTO.Auth, "Books": books}
+	page := map[string]interface{}{"Genres": genresArr, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": genres.Name, "Auth": Book_DTO.Auth, "Books": books}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -243,7 +243,7 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		//return err
 	}
-	genres, err := h.service.GetAllGenres(context.TODO())
+	genres, err := genre.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -252,7 +252,7 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 
 	URL_MAP[book.Name] = "/book/" + book.UUID
 
-	URL_NAME := [3]string{"Главная", "Книги", book.Name}
+	URL_NAME := []string{"Главная", "Книги", book.Name}
 	var books []Book
 	books = append(books, book)
 
@@ -356,7 +356,7 @@ func (h *handler) GetBookFindHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 
-	genres, err := h.service.GetAllGenres(context.TODO())
+	genres, err := genre.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)

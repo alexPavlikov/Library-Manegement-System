@@ -90,21 +90,6 @@ func (s *Service) DeleteBook(ctx context.Context, uuid string) error {
 }
 
 // genre
-func (s *Service) GetAllGenres(ctx context.Context) ([]Genre, error) {
-	genres, err := s.repository.GetAllGenres(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get all genres, due to err: %s", err)
-	}
-	return genres, nil
-}
-
-func (s *Service) GetGenreByLink(ctx context.Context, link string) (Genre, error) {
-	g, err := s.repository.GetGenreByLink(ctx, link)
-	if err != nil {
-		return Genre{}, fmt.Errorf("failed to get genre by link, due to err: %v", err)
-	}
-	return g, nil
-}
 
 //authors
 

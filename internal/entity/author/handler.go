@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/book"
+	"github.com/alexPavlikov/Library-Manegement-System/internal/entity/genre"
 	"github.com/alexPavlikov/Library-Manegement-System/internal/handlers"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
 	"github.com/julienschmidt/httprouter"
@@ -53,8 +54,14 @@ func (h *handler) GetAuthorsHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
+	genres, err := genre.GetAllGenres(context.TODO())
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
 	URL_NAME := []string{"Главная", "Авторы"}
-	page := map[string]interface{}{"Genres": book.Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": book.Book_DTO.Auth, "Authors": authors}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": book.Book_DTO.Auth, "Authors": authors}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -84,13 +91,13 @@ func (h *handler) AuthorFindHandler(w http.ResponseWriter, r *http.Request) {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	fmt.Println("response Body:", string(body))
 
 	err = json.Unmarshal(body, &rs)
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 	}
+
 	Authors, err = h.service.GetAuthorByName(context.TODO(), rs.Text)
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
@@ -105,9 +112,15 @@ func (h *handler) GetAuthorsFindHandler(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
+	genres, err := genre.GetAllGenres(context.TODO())
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
 	URL_NAME := []string{"Главная", "Авторы", fmt.Sprintf(`Результаты поиска по запросу "%s"`, rs.Text)}
 
-	page := map[string]interface{}{"Genres": book.Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": book.Book_DTO.Auth, "Authors": Authors}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": book.Book_DTO.Auth, "Authors": Authors}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -129,9 +142,20 @@ func (h *handler) GetAuthorHandler(w http.ResponseWriter, r *http.Request) {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	fmt.Println(author)
 
 	tmpl, err := template.ParseGlob("./internal/html/*.html")
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	text, err := h.service.FindBiography(context.TODO(), author.UUID)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	genres, err := genre.GetAllGenres(context.TODO())
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -141,7 +165,7 @@ func (h *handler) GetAuthorHandler(w http.ResponseWriter, r *http.Request) {
 
 	URL_NAME := []string{"Главная", "Авторы", fullName}
 
-	page := map[string]interface{}{"Genres": book.Book_DTO.Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": fullName, "Auth": book.Book_DTO.Auth}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": fullName, "Auth": book.Book_DTO.Auth, "Author": author, "Text": text}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {

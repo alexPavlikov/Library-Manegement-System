@@ -13,10 +13,10 @@ type Repository interface {
 	UpdateBook(ctx context.Context, book *Book) error
 	DeleteBook(ctx context.Context, uuid string) error
 	FindAllAuthorsByBook(ctx context.Context, uuid string) ([]Author, error)
-	FindAllGenreByBook(ctx context.Context, uuid string) ([]Genre, error)
+	// FindAllGenreByBook(ctx context.Context, uuid string) ([]Genre, error)
 	FindAllAwardsByBook(ctx context.Context, uuid string) ([]Awards, error)
-	GetAllGenres(ctx context.Context) ([]Genre, error)
-	GetGenreByLink(ctx context.Context, link string) (Genre, error)
+	// GetAllGenres(ctx context.Context) ([]Genre, error)
+	// GetGenreByLink(ctx context.Context, link string) (Genre, error)
 	CreateCommentForBook(ctx context.Context, comment *Comment) error
 	GetAllComment(ctx context.Context, book_uuid string, user_uuid string) ([]Comment, bool, error)
 }
