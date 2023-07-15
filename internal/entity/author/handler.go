@@ -61,7 +61,7 @@ func (h *handler) GetAuthorsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	URL_NAME := []string{"Главная", "Авторы"}
-	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": book.Book_DTO.Auth, "Authors": authors}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Авторы", "Auth": book.Book_DTO.Auth, "Authors": authors}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -120,7 +120,7 @@ func (h *handler) GetAuthorsFindHandler(w http.ResponseWriter, r *http.Request) 
 
 	URL_NAME := []string{"Главная", "Авторы", fmt.Sprintf(`Результаты поиска по запросу "%s"`, rs.Text)}
 
-	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Новинки", "Auth": book.Book_DTO.Auth, "Authors": Authors}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": fmt.Sprintf(`Результаты поиска по запросу "%s"`, rs.Text), "Auth": book.Book_DTO.Auth, "Authors": Authors}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -165,7 +165,7 @@ func (h *handler) GetAuthorHandler(w http.ResponseWriter, r *http.Request) {
 
 	URL_NAME := []string{"Главная", "Авторы", fullName}
 
-	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": fullName, "Auth": book.Book_DTO.Auth, "Author": author, "Text": text}
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": fullName, "Auth": book.Book_DTO.Auth, "Author": author, "Text": text, "Books": book.Book_DTO.AuthorBooksMostPopular}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {

@@ -2,6 +2,7 @@ package book
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -35,6 +36,68 @@ func (r *repository) CreateBook(ctx context.Context, book *Book) error {
 	}
 	return nil
 }
+
+//------------------------
+
+func (r *repository) TestGetAllBooks(ctx context.Context) (map[int][]Book, error) {
+	query := `
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.description, b.pdf_link, b.publishing, p.name
+	FROM public.book b
+	JOIN public.publishing p ON p.id = b.publishing
+	WHERE b.deleted = false;
+	`
+	var BooksPag = map[int][]Book{}
+
+	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	rows, err := r.client.Query(ctx, query)
+	if err != nil {
+		return BooksPag, err
+	}
+	var i = 1
+	var k int = 1
+	var book Book
+	var books []Book
+
+	for rows.Next() {
+
+		err = rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name)
+		if err != nil {
+			return BooksPag, err
+		}
+
+		book.Authors, err = r.FindAllAuthorsByBook(ctx, book.UUID)
+		if err != nil {
+			return BooksPag, err
+		}
+
+		// book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
+		// if err != nil {
+		// 	return BooksPag, err
+		// }
+		// book.Awards, err = r.FindAllAwardsByBook(ctx, book.UUID)
+		// if err != nil {
+		// 	return Books, err
+		// }
+		books = append(books, book)
+
+		if i%12 == 0 {
+			BooksPag[k] = books
+			books = nil
+			k++
+		}
+		i++
+	}
+
+	defer func() {
+		BooksPag[k] = books
+		k++
+	}()
+
+	return BooksPag, nil
+}
+
+//------------------------
 
 // GetAll implements Repository.
 func (r *repository) GetAllBooks(ctx context.Context) ([]Book, error) {
@@ -178,9 +241,63 @@ func (r *repository) GetNewBooks(ctx context.Context) ([]Book, error) {
 			return nil, err
 		}
 
+		book.Authors, err = r.FindAllAuthorsByBook(ctx, book.UUID)
+		if err != nil {
+			return books, err
+		}
+
+		book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
+		if err != nil {
+			return books, err
+		}
+
 		books = append(books, book)
 	}
 	return books, nil
+}
+
+func (r *repository) GetAllBooksByAuthor(ctx context.Context, authors string) ([]Book, string, error) {
+	query := `
+	SELECT b.id, b.name, b.photo, b.year, b.pages, b.description, b.pdf_link, b.publishing, p.name, a.Lastname
+	FROM public.book b
+	JOIN public.publishing p ON p.id = b.publishing
+	JOIN public.author a ON a.id = $1
+	WHERE b.deleted = 'false' AND b.id IN (
+		SELECT ba.book_id FROM public.book_authors ba
+		WHERE ba.author_id = $1
+	); 
+	`
+	var authorLastname string
+	r.logger.Tracef("SQL Query: %v", utils.FormatQuery(query))
+
+	rows, err := r.client.Query(ctx, query, authors)
+	if err != nil {
+		return nil, authorLastname, err
+	}
+
+	var book Book
+	var books []Book
+
+	for rows.Next() {
+		err = rows.Scan(&book.UUID, &book.Name, &book.Photo, &book.Year, &book.Pages, &book.Description, &book.PDFLink, &book.Publishing.UUID, &book.Publishing.Name, &authorLastname)
+		if err != nil {
+			return nil, authorLastname, err
+		}
+
+		book.Authors, err = r.FindAllAuthorsByBook(ctx, book.UUID)
+		if err != nil {
+			return books, "", err
+		}
+
+		book.Genre, err = genre.FindAllGenreByBook(ctx, book.UUID)
+		if err != nil {
+			return books, "", err
+		}
+
+		books = append(books, book)
+	}
+
+	return books, authorLastname, nil
 }
 
 // GetBook implements Repository.
@@ -361,6 +478,8 @@ func (r *repository) CreateCommentForBook(ctx context.Context, comment *Comment)
 	`
 
 	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
+
+	fmt.Println(comment.Book_id, comment.User_id, comment.Text, comment.Time)
 
 	err := r.client.QueryRow(ctx, query, comment.Book_id, comment.User_id, comment.Text, comment.Time).Scan(&comment.Id)
 	if err != nil {

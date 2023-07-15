@@ -50,6 +50,15 @@ func (s *Service) GetMustPopularBooks(ctx context.Context) ([]Book, error) {
 	return books, nil
 }
 
+func (s *Service) GetAllBooksByAuthor(ctx context.Context, author string) ([]Book, string, error) {
+	books, author, err := s.repository.GetAllBooksByAuthor(ctx, author)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to get all books by auhtor, due to err: %v", err)
+	}
+	fmt.Println(books, author)
+	return books, author, nil
+}
+
 func (s *Service) GetBook(ctx context.Context, uuid string) (Book, error) {
 	book, err := s.repository.GetOneBook(ctx, uuid)
 	if err != nil {
@@ -117,4 +126,12 @@ func (s *Service) GetAllCommentByBook(ctx context.Context, book_uuid string, use
 		return nil, false, fmt.Errorf("failed to get all comments by book, due to err; %v", err)
 	}
 	return comments, ok, nil
+}
+
+func (s *Service) Test(ctx context.Context) (map[int][]Book, error) {
+	books, err := s.repository.TestGetAllBooks(ctx)
+	if err != nil {
+		return books, err
+	}
+	return books, err
 }

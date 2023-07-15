@@ -3,6 +3,8 @@ package author
 import (
 	"context"
 	"fmt"
+	"strings"
+	"unicode"
 
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/client/postgresql"
 	"github.com/alexPavlikov/Library-Manegement-System/pkg/logging"
@@ -91,11 +93,22 @@ func (r *repository) GetAuthor(ctx context.Context, uuid string) (Author, error)
 }
 
 func (r *repository) GetAuthorByName(ctx context.Context, name string) ([]Author, error) {
+	minNewNane := "%" + strings.ToLower(name) + "%"
 	newName := "%" + name + "%"
+	startLower := strings.ToUpper(name) + "%"
+
+	rText := []rune(name)
+	rText[0] = unicode.ToUpper(rText[0])
+	allMin := string(rText) + "%"
+
 	query := `
 	SELECT id, firstname, lastname, patronymic, photo, birth_place, age, date_of_birth, date_of_death, gender
 	FROM public.author
-	WHERE firstname LIKE $1 OR lastname LIKE $2 AND deleted = 'false'
+	WHERE firstname LIKE $1 OR lastname LIKE $1 OR patronymic LIKE $1
+	OR firstname LIKE $2 OR lastname LIKE $2 OR patronymic LIKE $2
+	OR firstname LIKE $3 OR lastname LIKE $3 OR patronymic LIKE $3
+	OR firstname LIKE $4 OR lastname LIKE $4 OR patronymic LIKE $4
+	AND deleted = 'false'
 	`
 
 	r.logger.Tracef("SQL Query: %s", utils.FormatQuery(query))
@@ -103,7 +116,7 @@ func (r *repository) GetAuthorByName(ctx context.Context, name string) ([]Author
 	var author Author
 	var authors []Author
 
-	rows, err := r.client.Query(ctx, query, newName, newName)
+	rows, err := r.client.Query(ctx, query, newName, minNewNane, startLower, allMin)
 	if err != nil {
 		fmt.Println("Error ", err)
 		return nil, err

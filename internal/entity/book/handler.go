@@ -43,6 +43,7 @@ func (h *handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodGet, "/", h.IndexHandler)
 	router.HandlerFunc(http.MethodGet, "/books/", h.PopularBooksHandler)
 	router.HandlerFunc(http.MethodGet, "/books/genre/:uuid", h.GenreHandler)
+	router.HandlerFunc(http.MethodGet, "/books/list/:uuid", h.BooksListHandler)
 	//router.HandlerFunc(http.MethodGet, "/book/all", h.GetAllBookHandler)
 	router.HandlerFunc(http.MethodGet, "/book/:uuid", h.BookHandler)
 
@@ -51,6 +52,8 @@ func (h *handler) Register(router *httprouter.Router) {
 
 	router.HandlerFunc(http.MethodPost, "/books/find/", h.BookFindHandler)
 	router.HandlerFunc(http.MethodGet, "/books/find/", h.GetBookFindHandler)
+
+	router.HandlerFunc(http.MethodGet, "/test", h.test)
 }
 
 func (h *handler) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -118,6 +121,46 @@ func (h *handler) PopularBooksHandler(w http.ResponseWriter, r *http.Request) {
 	URL_NAME := []string{"Главная", "Популярные"}
 
 	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Популярные", "Auth": Book_DTO.Auth, "Books": books}
+
+	err = tmpl.ExecuteTemplate(w, "header", nil)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+	err = tmpl.ExecuteTemplate(w, "index", page)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+}
+
+func (h *handler) BooksListHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseGlob("./internal/html/*.html")
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	author := strings.TrimPrefix(r.URL.Path, "/books/list/")
+
+	books, authorLastname, err := h.service.GetAllBooksByAuthor(context.TODO(), author)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	genres, err := genre.GetAllGenres(context.TODO())
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+
+	URL_NAME := []string{"Главная", "Книги", authorLastname}
+
+	page := map[string]interface{}{"Genres": genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Список книг", "Auth": Book_DTO.Auth, "Books": books}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -253,8 +296,8 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 	URL_MAP[book.Name] = "/book/" + book.UUID
 
 	URL_NAME := []string{"Главная", "Книги", book.Name}
-	var books []Book
-	books = append(books, book)
+	// var books []Book
+	// books = append(books, book)
 
 	comments, ok, err := h.service.GetAllCommentByBook(context.TODO(), book.UUID, Book_DTO.User_id)
 	if err != nil {
@@ -262,7 +305,7 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
-	page := map[string]interface{}{"Genres": genres, "Books": books, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": book.Name, "Auth": Book_DTO.Auth, "User": Book_DTO.User_id, "Comments": comments, "ComOK": ok}
+	page := map[string]interface{}{"Genres": genres, "Books": book, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": book.Name, "Auth": Book_DTO.Auth, "User": Book_DTO.User_id, "Comments": comments, "ComOK": ok}
 
 	err = tmpl.ExecuteTemplate(w, "header", nil)
 	if err != nil {
@@ -274,7 +317,7 @@ func (h *handler) BookHandler(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.ExecuteTemplate(w, "book", page)
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
-		w.WriteHeader(http.StatusBadRequest)
+		//w.WriteHeader(http.StatusBadRequest)
 		//return err
 	}
 }
@@ -374,6 +417,71 @@ func (h *handler) GetBookFindHandler(w http.ResponseWriter, r *http.Request) {
 		//return err
 	}
 	err = tmpl.ExecuteTemplate(w, "index", page)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+}
+
+var i = 1
+
+func (h *handler) test(w http.ResponseWriter, r *http.Request) {
+
+	tmpl, err := template.ParseGlob("./internal/html/*.html")
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+
+	books, err := h.service.Test(context.TODO())
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	r.ParseForm()
+	id := r.FormValue("id")
+
+	var class, clss string
+
+	if id == "m" {
+
+		if i > 1 {
+			class = ""
+			i -= 1
+
+		} else {
+			class = "untouchable"
+		}
+	} else if id == "p" {
+		if len(books[i+1]) == 12 {
+			i += 1
+		} else {
+			i += 1
+			clss = "untouchable"
+		}
+	}
+
+	Genres, err := genre.GetAllGenres(context.TODO())
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+
+	URL_NAME := []string{"Главная", "Книги", "Test"}
+
+	page := map[string]interface{}{"Genres": Genres, "URLs": URL_MAP, "URL_NAME": URL_NAME, "Title": "Test", "Auth": Book_DTO.Auth, "Books": books[i], "Index": i, "Class1": class, "Class2": clss}
+
+	err = tmpl.ExecuteTemplate(w, "header", nil)
+	if err != nil {
+		h.logger.Tracef("failed: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		//return err
+	}
+	err = tmpl.ExecuteTemplate(w, "test", page)
 	if err != nil {
 		h.logger.Tracef("failed: %v", err)
 		w.WriteHeader(http.StatusBadRequest)

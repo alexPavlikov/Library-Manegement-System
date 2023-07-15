@@ -88,3 +88,22 @@
     box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.4);
 
 }
+
+.b-list {
+    display: block;
+    width: 60%;
+    color: white;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 700;
+    background-color: rgb(255, 186, 81);
+    padding: 10px 20px;
+    border-radius: 15px;
+    text-align: center;
+    margin: 30px 20%;
+}
+
+.b-list:hover {
+    cursor: pointer;
+    opacity: .7;
+}

@@ -81,26 +81,25 @@
                 <div class="book-content">
                     <h2 class="title">{{ .Title }}</h2>
                     <div class="book-content-colums">
-                    {{ range $_, $b := .Books }}
                         <div class="photo">
-                            <img src="../../assets/image/book_covers/{{$b.Photo}}" alt="">
+                            <img src="../../assets/image/book_covers/{{.Books.Photo}}" alt="">
                         </div>
                         <div class="info">
                             <div class="stat">
                                 <div class="stat-item">
-                                    <div><span class="margin-right">Name</span><span class="text">{{ $b.Name }}</span></div>
+                                    <div><span class="margin-right">Name</span><span class="text">{{ .Books.Name }}</span></div>
                                     <div><span class="margin-right">Author</span><span class="text">
-                                        {{ range $_, $ba := $b.Authors }}
+                                        {{ range $_, $ba := .Books.Authors }}
                                         <a class="text" href="/author/{{ $ba.UUID }}">{{ $ba.Firstname }} {{ $ba.Lastname }}</a>
                                         {{ end }}
                                     </span></div>
                                     <div><span class="margin-right">Genre</span><span class="text">
-                                        {{ range $_, $bg := $b.Genre }}
+                                        {{ range $_, $bg := .Books.Genre }}
                                         <a class="text" href="/books/genre/{{ $bg.Link }}">{{ $bg.Name }}</a>
                                         {{ end }}
                                     </span></div>
-                                    <div><span class="margin-right">Year</span><span class="text">{{ $b.Year }}</span></div>
-                                    <div><span class="margin-right">Pages</span><span class="text">{{ $b.Pages }}</span></div>
+                                    <div><span class="margin-right">Year</span><span class="text">{{ .Books.Year }}</span></div>
+                                    <div><span class="margin-right">Pages</span><span class="text">{{ .Books.Pages }}</span></div>
                                     <div><span class="margin-right">Rating</span><span class="text">3.4 из 5</span></div>
                                     <div style="position: relative;"><span class="margin-right" style="margin-top: 12px;">Your votng</span><span class="text">
                                         <div style="padding: 0;" class="star-rating">
@@ -176,41 +175,42 @@
                             </div>
                             <div  class="stat">
                                 <h3>Описание</h3>
-                                <p>{{ $b.Description }}</p>
+                                <p>{{ .Books.Description }}</p>
                             </div>
                         </div>
                         <form action="/book/download" method="post">
-                            <input type="text" name="uuid" value="{{ $b.UUID }}" style="display: none;">
+                            <input type="text" name="uuid" value="{{ .Books.UUID }}" style="display: none;">
                             <button class="read" type="submit">Читать книгу <i class="fa-solid fa-angle-right"></i></button>
                         </form>
-                        {{ end }}
+                        
                     </div>
 
                 </div>
                 <div class="link comment">
                     <form action="/book/comments/add" method="post" style="position: relative;">
-                        {{ if .ComOK }}
-                        <div class="comment-btn link-comment">
-                            <div class="wrapper">
-                                <a href="#demo-modal" style="color: white;">Комментарии</a>
-                            </div>
-
-                        </div>
-                        {{ else }}
-                            <input type="text" name="user" value="{{ .User }}" style="display: none;">
-                            {{ range $_, $bc := .Books }}
-                            <input type="text" name="book" value="{{ $bc.UUID }}" style="display: none;">
-                            {{ end }}
-                            <textarea name="comment" placeholder="Оставьте комментарий"></textarea>
-                            <button class="comment-btn" type="submit">Отправить </button>
+                        
+                            {{ if .ComOK }}
                             <div class="comment-btn link-comment">
                                 <div class="wrapper">
                                     <a href="#demo-modal" style="color: white;">Комментарии</a>
                                 </div>
 
                             </div>
-                        {{ end }}
-  
+                            {{ else }}
+                                {{  if .Auth }}
+                                    <input type="text" name="user" value="{{ .User }}" style="display: none;">
+                                    <input type="text" name="book" value="{{ .Books.UUID }}" style="display: none;">
+                                    <textarea name="comment" placeholder="Оставьте комментарий"></textarea>
+                                    <button class="comment-btn" type="submit">Отправить </button>
+                                    <div class="comment-btn link-comment">
+                                        <div class="wrapper">
+                                            <a href="#demo-modal" style="color: white;">Комментарии</a>
+                                        </div>
+
+                                    </div>
+                                {{ end }}  
+                            {{ end }}
+                             
                     </form>
                     <!-- <div class="rules"><a style="font-weight: 400;" href="">Конфиденциальность</a> <a style="font-weight: 400;" href="">Условия</a></div> -->
                 </div>

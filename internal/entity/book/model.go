@@ -22,6 +22,7 @@ type Author struct {
 	UUID        string
 	Firstname   string
 	Lastname    string
+	Patronymic  string
 	Photo       string
 	BirthPlace  string
 	Age         uint8

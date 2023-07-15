@@ -97,6 +97,7 @@ func (h *handler) UserRegHandler(w http.ResponseWriter, r *http.Request) {
 	book.Book_DTO.User_id = user.Id
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
 func (h *handler) UserAuthHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 

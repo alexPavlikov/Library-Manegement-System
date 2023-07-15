@@ -523,3 +523,58 @@ hr {
     grid-template-columns: repeat(4, 25%);
     gap: 20px;
 }
+
+/* pag */
+.pagination {
+	position: absolute;
+    bottom: 20px;
+    width: 17%;
+	margin: 0 41%;
+	padding: 10px;
+	background-color: #fff;
+	border-radius: 40px;
+	box-shadow: 0 5px 25px 0 rgba(0, 0, 0, 0.5);
+}
+.pagination form {
+	display: inline-block;
+	list-style: none;
+}
+.pagination form button {
+	display: block;
+	width: 40px;
+	height: 40px;
+	line-height: 40px;
+	background-color: #fff;
+	text-align: center;
+	text-decoration: none;
+	color: rgb(255, 186, 81);
+    border: 2px solid rgb(255, 186, 81);;
+	border-radius: 4px;
+	margin: 5px;
+    font-weight: 700;
+	transition: all .3s ease;
+}
+.pagination form button:hover, .pagination form button:active {
+	color: #fff;
+	background-color: #ff4242;
+}
+
+.pagination form button:hover {
+    cursor: pointer;
+}
+
+.pagination form:first-child button {
+	border-radius: 40px 0 0 40px;
+}
+.pagination form:last-child button {
+	border-radius: 0 40px 40px 0;
+}
+
+.untouchable {
+	pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.4;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
